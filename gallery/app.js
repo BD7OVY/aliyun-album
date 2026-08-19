@@ -172,7 +172,8 @@
     lbImage.src = `thumbnails/${photo.thumbnail}`;
     lbImage.alt = photo.name;
     lbName.textContent = photo.name;
-    lbOriginal.href = photo.share_url || '#';
+    lbOriginal.href = photo.original || '#';
+    lbOriginal.style.display = photo.original ? 'inline-flex' : 'none';
 
     lightbox.style.display = 'flex';
     document.body.style.overflow = 'hidden';

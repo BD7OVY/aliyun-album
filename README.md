@@ -1,103 +1,114 @@
-# 阿里云盘共享相册
+# 培训照片共享相册
 
-利用阿里云盘大容量存储，搭建带密码访问的共享相册。
+面向培训场景：**摄影师通过网页上传照片 → 自动存阿里云盘 + 生成相册 → 分享链接供所有人查看下载**。
 
-## 架构
+阿里云盘只做照片存储，摄影师全程不需要接触你的阿里云盘账户。
+
+## 三个入口
+
+| 入口 | 给谁 | 地址 | 密码 |
+|------|------|------|------|
+| 📤 **上传入口** | 摄影师 | `http://电脑IP:8091/` | 上传码（.env 的 ALBUM_UPLOAD_CODE） |
+| 🛠 **管理入口** | 你自己 | `http://电脑IP:8091/admin` | 管理码（.env 的 ALBUM_ADMIN_CODE） |
+| 👀 **查看入口** | 所有人 | GitHub Pages 链接 | 访问密码（run.bat --set-pass 设置） |
+
+## 目录结构
 
 ```
 aliyun-album/
-├── config.json          # 配置（相册名、密码哈希、缩略图参数）
-├── .env                 # 阿里云盘 refresh_token（从 .env.example 复制）
-├── .env.example         # .env 模板
+├── config.json          # 配置（相册名、folder_id、缩略图参数）
+├── .env                 # 阿里云盘 token + 上传码 + 管理码（不入库）
 ├── harness/             # 工作流引擎（Python，确定性逻辑）
 │   ├── aliyun_client.py # 阿里云盘 API 封装
-│   ├── auth.py          # 认证辅助（env/cache/扫码登录）
-│   ├── get_token.py     # 一键获取/保存 refresh_token
+│   ├── auth.py          # 认证辅助（env/缓存/扫码）
 │   ├── thumbnail.py     # 缩略图生成（Pillow）
 │   ├── manifest.py      # 数据清单管理
-│   ├── sync.py          # 同步主流程
+│   ├── sync.py          # 同步主流程（手动上传云盘后的同步）
 │   └── validate.py      # 输出校验
-├── gallery/             # 静态画廊（纯 HTML/CSS/JS）
+├── server/              # 上传服务（Flask）
+│   ├── app.py           # 上传 + 管理接口
+│   ├── templates/       # 上传页 + 管理页
+│   └── _inbox/          # 上传临时缓冲（自动清理）
+├── gallery/             # 静态画廊（部署到 GitHub Pages）
 │   ├── index.html       # 画廊页面
-│   ├── style.css        # 样式
-│   ├── app.js           # 交互逻辑
-│   ├── data.json        # 照片数据（harness 自动生成）
-│   └── thumbnails/      # 缩略图（harness 自动生成）
-├── setup.bat            # 安装依赖
-├── run.bat              # 启动同步
-└── deploy.bat           # 一键提交并推送 GitHub（线上更新）
+│   ├── app.js / style.css
+│   ├── data.json        # 照片数据（自动生成）
+│   ├── thumbnails/      # 缩略图（自动生成，~4KB/张）
+│   └── originals/       # 原图（自动生成，随部署上线）
+├── setup.bat            # 安装依赖（一次）
+├── run.bat              # 同步（手动流程用）
+├── upload_server.bat    # 启动上传服务（培训时双击）
+└── deploy.bat           # 一键提交推送 GitHub（线上更新）
 ```
 
 ## 快速开始
 
-> 已帮你完成：token 配置、云盘"共享相册"文件夹创建、folder_id 写入、本地 git 初始化、依赖安装。
+> 已帮你完成：token 配置、云盘"共享相册"文件夹创建、依赖安装、本地 git 初始化。
 
-### 第 0 步：上传照片（日常操作，手机就能做）
-
-1. 手机/电脑打开**阿里云盘 App**
-2. 进入网盘根目录的 **"共享相册"** 文件夹（已在你的云盘里建好）
-3. 把要分享的照片传进去（支持 jpg/png/gif/webp/heic）
-4. 完成
-
-### 第 1 步：同步（生成相册数据）
-
-1. 双击 **`run.bat`**
-2. 等待输出 "Sync complete. N photos in manifest."
-3. 完成后 `gallery/` 里就有了最新缩略图和 data.json
-
-### 第 2 步：设置访问密码（只需一次）
+### 第 1 步：设置访问密码（只需一次）
 
 ```bat
 run.bat --set-pass
 ```
-输入你想分享给家人的密码。
+输入你想分享给所有人的查看密码。
 
-### 第 3 步：部署到 GitHub Pages
+### 第 2 步：启动上传服务（培训时）
 
-**一次性准备（首次）：**
-1. 浏览器打开 https://github.com/new
-2. Repository name 填 `aliyun-album`，选 **Public**，**不要**勾选任何初始化选项，点 Create
-3. 复制仓库地址（形如 `https://github.com/你的用户名/aliyun-album.git`）
-4. 在项目文件夹打开命令行，执行：
-   ```bat
-   git remote add origin 你的仓库地址
-   git push -u origin main
-   ```
-5. 打开 https://github.com/你的用户名/aliyun-album → Settings → Pages
-6. Source 选 **Deploy from a branch** → Branch 选 **main / (root)** → Save
-7. 等 1-2 分钟，访问 `https://你的用户名.github.io/aliyun-album/gallery/`
+双击 **`upload_server.bat`**，窗口会显示：
 
-**以后每次更新（日常操作）：**
-1. 阿里云盘 App 上传新照片
-2. 双击 `run.bat`（同步）
-3. 双击 `deploy.bat`（提交并推送，1-2 分钟后线上更新）
+```
+上传入口(给摄影师): http://192.168.x.x:8091/
+管理入口(给自己):   http://192.168.x.x:8091/admin
+```
+
+- **首次运行** Windows 防火墙弹窗请点"允许访问"
+- 摄影师连同一个 WiFi，手机浏览器打开上传入口即可传照片
+- 上传后**自动完成**：原图存本地 + 备份到阿里云盘 + 生成缩略图 + 更新相册数据
+
+### 第 3 步：部署到 GitHub Pages（一次性）
+
+1. 打开 https://github.com/new ，仓库名填 `aliyun-album`，选 **Public**，不勾选任何初始化项，点 Create
+2. 复制仓库地址（`https://github.com/你的用户名/aliyun-album.git`），发给我帮你推送
+3. 推送完成后：仓库 Settings → Pages → Source 选 **Deploy from a branch** → **main / (root)** → Save
+4. 等 1-2 分钟
+5. 把查看链接 `https://你的用户名.github.io/aliyun-album/gallery/` 填进 `config.json` 的 `site.base_url`
 
 ### 第 4 步：分享
 
-- **查看链接**：把 `https://你的用户名.github.io/aliyun-album/gallery/` + 访问密码 发给家人
-- **上传入口**：只你自己有（阿里云盘"共享相册"文件夹），家人不需要上传
+- **给摄影师**：上传入口链接 + 上传码
+- **给学员/家人**：查看链接 + 访问密码
+
+### 日常使用（培训当天）
+
+```
+摄影师手机连 WiFi → 打开上传链接 → 输入上传码 → 传照片（自动进云盘+相册）
+        ↓
+你双击 deploy.bat → 1-2 分钟后线上相册更新
+```
 
 ## 工作流
 
 ```
-管理员上传照片到阿里云盘
-        ↓
-run.bat → harness/sync.py
-        ↓
-  列出云盘文件 → 对比已有清单
-        ↓
-  新照片: 下载原图 → 生成缩略图 → 创建分享链接 → 写入清单
-  已删照片: 删缩略图 + 删清单条目
-        ↓
-  保存 data.json → 验证完整性
-        ↓
-画廊加载 data.json → 密码校验 → 瀑布流展示缩略图
-        ↓
-点击照片 → 灯箱预览 → 查看原图 → 跳转阿里云盘下载
+摄影师浏览器 ──上传照片──▶ 上传服务 (Flask, 电脑 8091 端口)
+                              │ 校验上传码
+                              ▼
+                     本地原图 gallery/originals/  ←─ 查看原图用
+                              │ 备份
+                              ▼
+                     阿里云盘「共享相册」文件夹（1.7T 存储）
+                              │
+                              ▼
+                     缩略图 + data.json 更新
+                              │ git push
+                              ▼
+                     GitHub Pages 查看链接（密码访问）
 ```
+
+补充：你自己手机传照片到云盘后，双击 `run.bat` 同样会同步进相册（自动下载原图 + 生成缩略图）。
 
 ## 设计原则
 
-1. **Harness 管确定性，LLM 管创意**：API 调用、缩略图生成、清单管理全部用代码确定性完成，不靠提示词约束。
-2. **缩略图本地、原图云端**：缩略图(~4KB/张)存静态站点，原图(几MB/张)留阿里云盘 1.7T。
-3. **不过度工程化**：纯静态画廊 + Python 脚本，无后端服务、无数据库、无 CI/CD。
+1. **Harness 管确定性**：上传、转存、缩略图、清单、发布全部代码完成，不靠提示词约束。
+2. **原图双存**：本地一份（查看/下载用）+ 阿里云盘一份（备份 + 1.7T 利用）。
+3. **不依赖阿里云盘分享 API**（官方已限制第三方分享，仅 4 小时有效）——查看原图直接走本地原图。
+4. **不过度工程化**：Flask 单文件服务 + 静态画廊，无数据库、无复杂部署。

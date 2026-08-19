@@ -34,6 +34,7 @@ ROOT = Path(__file__).parent.parent
 CONFIG_PATH = ROOT / 'config.json'
 ENV_PATH = ROOT / '.env'
 THUMB_DIR = ROOT / 'gallery' / 'thumbnails'
+ORIG_DIR = ROOT / 'gallery' / 'originals'
 
 
 def load_env():
@@ -109,11 +110,15 @@ def mock_sync(config):
         thumb_name = f'IMG_{idx:04d}.jpg'
         img.save(THUMB_DIR / thumb_name, 'JPEG', quality=85)
 
+        # Also keep a mock original so "view original" works in previews
+        ORIG_DIR.mkdir(parents=True, exist_ok=True)
+        img.save(ORIG_DIR / f'IMG_{idx:04d}.jpg', 'JPEG', quality=92)
+
         manifest.add_photo(
             manifest_data,
             p,
             thumb_name,
-            share_url='https://www.aliyundrive.com/s/mock_share_link',
+            original=f'originals/IMG_{idx:04d}.jpg',
             dimensions=(4032, 3024)
         )
         print(f'  [MOCK] Added {thumb_name}')
@@ -162,31 +167,35 @@ def real_sync(config):
 
     # 4. Process new files
     THUMB_DIR.mkdir(parents=True, exist_ok=True)
+    ORIG_DIR.mkdir(parents=True, exist_ok=True)
     if diff['new']:
         print(f'[4/5] Processing {len(diff["new"])} new files...')
         for i, f in enumerate(diff['new']):
             print(f'  [{i+1}/{len(diff["new"])}] {f["name"]}')
 
-            # Download temporarily
+            # Download original -> keep locally as gallery/originals/<file_id><ext>
             local_path = client.download_to_temp(f['file_id'])
+            ext = Path(f['name']).suffix.lower()
+            orig_name = f"{f['file_id']}{ext}"
+            orig_path = ORIG_DIR / orig_name
+            if not orig_path.exists():
+                shutil.copy2(local_path, orig_path)
 
-            # Generate thumbnail
+            # Generate thumbnail (named by file_id -> never collides)
             thumb_name = generate_thumbnail(
                 local_path,
                 str(THUMB_DIR),
                 max_width=config['gallery'].get('thumbnail_width', 480),
-                quality=config['gallery'].get('thumbnail_quality', 85)
+                quality=config['gallery'].get('thumbnail_quality', 85),
+                out_name=f"{f['file_id']}.jpg",
             )
 
             # Get dimensions
             dims = get_image_dimensions(local_path)
 
-            # Create share link
-            share = client.create_share_link(f['file_id'])
-            share_url = share.get('share_url', '')
-
-            # Add to manifest
-            manifest.add_photo(existing_manifest, f, thumb_name, share_url, dims)
+            # Add to manifest (no share link - Aliyun blocks the share API since 2025)
+            manifest.add_photo(existing_manifest, f, thumb_name,
+                               original=f'originals/{orig_name}', dimensions=dims)
 
             # Cleanup temp file
             try:
@@ -205,6 +214,11 @@ def real_sync(config):
             thumb_path = THUMB_DIR / p['thumbnail']
             if thumb_path.exists():
                 thumb_path.unlink()
+            # Delete local original
+            if p.get('original'):
+                orig_path = ORIG_DIR / Path(p['original']).name
+                if orig_path.exists():
+                    orig_path.unlink()
             print(f'  Removed {p["name"]}')
     else:
         print('[5/5] No files to remove.')

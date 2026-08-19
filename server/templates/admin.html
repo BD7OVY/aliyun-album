@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>相册管理后台</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #f6f8fb 0%, #eef2f7 100%);
+    min-height: 100vh; color: #1f2937; padding: 24px 16px 40px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .header h1 { font-size: 20px; font-weight: 700; }
+  .header a { font-size: 13px; color: #6b7280; text-decoration: none; }
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06); margin-bottom: 16px;
+  }
+  .login { text-align: center; padding: 48px 24px; }
+  .login h2 { font-size: 18px; margin-bottom: 16px; }
+  input[type=password] {
+    width: 100%; max-width: 320px; padding: 12px 14px; border: 1.5px solid #e5e7eb;
+    border-radius: 10px; font-size: 16px; outline: none; text-align: center;
+  }
+  .btn {
+    display: inline-block; margin-top: 14px; padding: 12px 40px; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 600; color: #fff; cursor: pointer;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+  }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .stat { background: #f8fafc; border-radius: 12px; padding: 16px; text-align: center; }
+  .stat .num { font-size: 26px; font-weight: 800; color: #2563eb; }
+  .stat .lbl { font-size: 12px; color: #6b7280; margin-top: 4px; }
+  .url-box { margin-bottom: 12px; }
+  .url-box .lbl { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+  .url-box .val {
+    display: flex; align-items: center; gap: 8px;
+    background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 12px;
+    font-size: 13px; word-break: break-all;
+  }
+  .copy { flex-shrink: 0; font-size: 12px; padding: 4px 10px; border: none; border-radius: 6px;
+          background: #e0e7ff; color: #4338ca; cursor: pointer; }
+  .section-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+  .grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; background: #f3f4f6; }
+  .empty { text-align: center; color: #9ca3af; font-size: 13px; padding: 24px 0; }
+  .msg { font-size: 13px; margin-top: 10px; min-height: 18px; }
+  .msg.ok { color: #10b981; } .msg.err { color: #ef4444; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>🛠 相册管理后台</h1>
+    <a href="/">← 返回上传页</a>
+  </div>
+
+  <div class="card login" id="loginCard">
+    <h2>请输入管理密码</h2>
+    <input type="password" id="adminCode" placeholder="管理密码">
+    <br>
+    <button class="btn" onclick="doLogin()">进入后台</button>
+    <div class="msg err" id="loginErr"></div>
+  </div>
+
+  <div id="panel" style="display:none">
+    <div class="card">
+      <div class="stats">
+        <div class="stat"><div class="num" id="sCount">-</div><div class="lbl">照片总数</div></div>
+        <div class="stat"><div class="num" id="sTime">-</div><div class="lbl">最近更新</div></div>
+        <div class="stat"><div class="num" id="sStatus">-</div><div class="lbl">发布状态</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">📤 上传入口（发给摄影师）</div>
+      <div class="url-box">
+        <div class="val"><span id="uUpload">-</span><button class="copy" onclick="copyText('uUpload')">复制</button></div>
+      </div>
+      <div class="section-title">👀 查看入口（发给所有人，需访问密码）</div>
+      <div class="url-box">
+        <div class="val"><span id="uView">-</span><button class="copy" onclick="copyText('uView')">复制</button></div>
+      </div>
+      <div style="font-size:12px;color:#9ca3af;margin-top:8px" id="hint"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🖼 最近上传</div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" style="display:none">还没有照片</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🚀 发布到线上</div>
+      <button class="btn" onclick="doPublish()" style="width:100%">立即发布（git push）</button>
+      <div class="msg" id="pubMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let code = localStorage.getItem('album_admin_code') || '';
+
+function doLogin() {
+  code = $('adminCode').value.trim() || code;
+  fetch('/api/status?code=' + encodeURIComponent(code))
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok) {
+        localStorage.setItem('album_admin_code', code);
+        $('loginCard').style.display = 'none';
+        $('panel').style.display = 'block';
+        render(d); loadPhotos();
+      } else {
+        $('loginErr').textContent = d.error || '密码错误';
+      }
+    })
+    .catch(() => $('loginErr').textContent = '无法连接服务');
+}
+
+function render(d) {
+  $('sCount').textContent = d.photo_count;
+  $('sTime').textContent = (d.updated_at || '-').slice(0, 16).replace('T', ' ');
+  $('sStatus').textContent = d.has_remote ? '已配置' : '未发布';
+  $('uUpload').textContent = d.upload_url + '/';
+  if (d.view_url) {
+    $('uView').textContent = d.view_url;
+  } else {
+    $('uView').textContent = '（未配置 GitHub Pages 链接）';
+    $('hint').textContent = '部署到 GitHub 后，在 config.json 的 site.base_url 填入查看链接';
+  }
+}
+
+function loadPhotos() {
+  fetch('/api/photos?code=' + encodeURIComponent(code) + '&n=12')
+    .then(r => r.json())
+    .then(d => {
+      if (!d.ok) return;
+      const g = $('grid');
+      g.innerHTML = '';
+      if (!d.photos.length) { $('empty').style.display = 'block'; return; }
+      $('empty').style.display = 'none';
+      d.photos.forEach(p => {
+        const img = document.createElement('img');
+        img.src = 'thumbnails/' + p.thumbnail;
+        img.title = p.name; img.loading = 'lazy';
+        g.appendChild(img);
+      });
+    });
+}
+
+function doPublish() {
+  const fd = new FormData(); fd.append('code', code);
+  fetch('/api/publish', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      const m = $('pubMsg');
+      m.textContent = d.message;
+      m.className = 'msg ' + (d.ok ? 'ok' : 'err');
+    });
+}
+
+function copyText(id) {
+  const t = $(id).textContent;
+  if (navigator.clipboard) navigator.clipboard.writeText(t);
+  else { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  alert('已复制');
+}
+
+// Auto-login if code saved
+if (code) { $('adminCode').value = code; doLogin(); }
+</script>
+</body>
+</html>

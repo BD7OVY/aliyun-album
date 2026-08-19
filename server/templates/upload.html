@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>照片上传</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #f6f8fb 0%, #eef2f7 100%);
+    min-height: 100vh; color: #1f2937; padding: 24px 16px 40px;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+  .header p { font-size: 13px; color: #6b7280; margin-top: 6px; }
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06); margin-bottom: 16px;
+  }
+  label { font-size: 13px; color: #6b7280; display: block; margin-bottom: 6px; }
+  input[type=text], input[type=password] {
+    width: 100%; padding: 12px 14px; border: 1.5px solid #e5e7eb;
+    border-radius: 10px; font-size: 16px; outline: none; transition: border .2s;
+    background: #fafbfc;
+  }
+  input:focus { border-color: #3b82f6; background: #fff; }
+  .drop {
+    margin-top: 14px; border: 2px dashed #cbd5e1; border-radius: 14px;
+    padding: 32px 16px; text-align: center; cursor: pointer;
+    transition: all .2s; background: #fafbfc;
+  }
+  .drop:hover, .drop.dragover { border-color: #3b82f6; background: #eff6ff; }
+  .drop .icon { font-size: 40px; margin-bottom: 8px; }
+  .drop p { font-size: 15px; font-weight: 600; color: #374151; }
+  .drop span { font-size: 12px; color: #9ca3af; display: block; margin-top: 4px; }
+  .queue { margin-top: 12px; }
+  .item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6; font-size: 13px;
+  }
+  .item:last-child { border-bottom: none; }
+  .item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item .status { font-size: 12px; white-space: nowrap; }
+  .item.ok .status { color: #10b981; }
+  .item.fail .status { color: #ef4444; }
+  .item.up .status { color: #3b82f6; }
+  .bar { height: 4px; background: #e5e7eb; border-radius: 2px; margin-top: 12px; overflow: hidden; }
+  .bar > div { height: 100%; background: linear-gradient(90deg,#3b82f6,#06b6d4); width: 0; transition: width .3s; }
+  .btn {
+    width: 100%; margin-top: 16px; padding: 14px; border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 600; color: #fff; cursor: pointer;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 4px 14px rgba(59,130,246,.35);
+  }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .result { text-align: center; font-size: 14px; margin-top: 12px; min-height: 20px; }
+  .result.ok { color: #10b981; font-weight: 600; }
+  .result.err { color: #ef4444; }
+  .tip { font-size: 12px; color: #9ca3af; text-align: center; margin-top: 24px; line-height: 1.8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>📷 照片上传</h1>
+    <p>上传后自动进入相册，稍后即可在查看链接中看到</p>
+  </div>
+
+  <div class="card">
+    <label>上传码（向管理员索取）</label>
+    <input type="password" id="code" placeholder="请输入上传码" autocomplete="off">
+    <div class="drop" id="drop">
+      <div class="icon">📁</div>
+      <p>点击选择照片，或拖拽到此处</p>
+      <span>支持 JPG / PNG / HEIC，单张不超过 60MB，可多选</span>
+    </div>
+    <input type="file" id="file" accept="image/*,.heic" multiple hidden>
+    <div class="queue" id="queue"></div>
+    <div class="bar" id="bar" style="display:none"><div></div></div>
+    <button class="btn" id="btn" disabled>开始上传</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <div class="tip">如有问题，请联系管理员</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let files = [];
+
+// Restore code
+const saved = localStorage.getItem('album_upload_code');
+if (saved) $('code').value = saved;
+
+function refreshBtn() {
+  $('btn').disabled = !($('code').value.trim() && files.length > 0);
+}
+$('code').addEventListener('input', () => { localStorage.setItem('album_upload_code', $('code').value.trim()); refreshBtn(); });
+
+$('drop').addEventListener('click', () => $('file').click());
+$('drop').addEventListener('dragover', e => { e.preventDefault(); $('drop').classList.add('dragover'); });
+$('drop').addEventListener('dragleave', () => $('drop').classList.remove('dragover'));
+$('drop').addEventListener('drop', e => {
+  e.preventDefault(); $('drop').classList.remove('dragover');
+  addFiles(e.dataTransfer.files);
+});
+$('file').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
+
+function addFiles(list) {
+  for (const f of list) files.push(f);
+  renderQueue(); refreshBtn();
+}
+
+function renderQueue() {
+  const q = $('queue');
+  q.innerHTML = '';
+  files.forEach((f, i) => {
+    const d = document.createElement('div');
+    d.className = 'item'; d.id = 'item-' + i;
+    d.innerHTML = `<span class="name">${f.name}</span><span class="status">等待</span>`;
+    q.appendChild(d);
+  });
+}
+
+async function uploadOne(file, i) {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('code', $('code').value.trim());
+  const item = $('item-' + i);
+  item.querySelector('.status').textContent = '上传中...';
+  item.classList.add('up');
+  try {
+    const res = await fetch('/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.ok) {
+      item.classList.remove('up'); item.classList.add('ok');
+      item.querySelector('.status').textContent = '✓ 完成';
+      return true;
+    } else {
+      item.classList.remove('up'); item.classList.add('fail');
+      item.querySelector('.status').textContent = '✗ ' + (data.error || '失败');
+      return false;
+    }
+  } catch (e) {
+    item.classList.remove('up'); item.classList.add('fail');
+    item.querySelector('.status').textContent = '✗ 网络错误';
+    return false;
+  }
+}
+
+$('btn').addEventListener('click', async () => {
+  const btn = $('btn'); btn.disabled = true;
+  $('bar').style.display = 'block';
+  $('result').className = 'result'; $('result').textContent = '';
+  let ok = 0, fail = 0;
+  for (let i = 0; i < files.length; i++) {
+    const res = await uploadOne(files[i], i);
+    res ? ok++ : fail++;
+    $('bar').querySelector('div').style.width = Math.round((i + 1) / files.length * 100) + '%';
+  }
+  const r = $('result');
+  if (fail === 0) { r.className = 'result ok'; r.textContent = `🎉 全部上传成功（${ok} 张）！`; }
+  else { r.className = 'result err'; r.textContent = `完成：成功 ${ok} 张，失败 ${fail} 张`; }
+  files = []; renderQueue();
+  $('bar').querySelector('div').style.width = '0';
+  setTimeout(() => { $('bar').style.display = 'none'; btn.disabled = !$('code').value.trim(); }, 500);
+});
+</script>
+</body>
+</html>

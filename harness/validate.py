@@ -4,7 +4,7 @@ Output validation - checks gallery integrity after sync.
 Verifies:
   1. data.json exists and parses as valid JSON
   2. Every thumbnail referenced in manifest exists on disk
-  3. Every photo has a share_url (non-empty)
+  3. Every photo has a local original (originals/) - required for "view original"
   4. No orphan thumbnail files (on disk but not in manifest)
 """
 import json
@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 MANIFEST_PATH = ROOT / 'gallery' / 'data.json'
 THUMB_DIR = ROOT / 'gallery' / 'thumbnails'
+ORIG_DIR = ROOT / 'gallery' / 'originals'
 
 
 def validate_all():
@@ -45,10 +46,15 @@ def validate_all():
         if not thumb_path.exists():
             issues.append(f'MISSING thumbnail: {thumb} (photo: {p["name"]})')
 
-    # 3. Every photo has a share_url
+    # 3. Every photo has a local original (required for "view original" download)
     for p in photos:
-        if not p.get('share_url'):
-            issues.append(f'EMPTY share_url for: {p["name"]}')
+        orig = p.get('original', '')
+        if not orig:
+            issues.append(f'EMPTY original for: {p["name"]}')
+        else:
+            orig_path = ORIG_DIR / Path(orig).name
+            if not orig_path.exists():
+                issues.append(f'MISSING original: {orig} (photo: {p["name"]})')
 
     # 4. Orphan thumbnails (on disk but not in manifest)
     if THUMB_DIR.exists():

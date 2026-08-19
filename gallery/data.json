@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-08-19T07:38:27Z",
+  "updated_at": "2026-08-19T08:29:13Z",
   "gallery": {
     "title": "共享相册",
     "subtitle": "珍贵瞬间，共同珍藏"
@@ -12,8 +12,8 @@
       "name": "IMG_0001.jpg",
       "size": 2100000,
       "thumbnail": "IMG_0001.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0001.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -24,8 +24,8 @@
       "name": "IMG_0002.jpg",
       "size": 2200000,
       "thumbnail": "IMG_0002.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0002.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -36,8 +36,8 @@
       "name": "IMG_0003.jpg",
       "size": 2300000,
       "thumbnail": "IMG_0003.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0003.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -48,8 +48,8 @@
       "name": "IMG_0004.jpg",
       "size": 2400000,
       "thumbnail": "IMG_0004.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0004.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -60,8 +60,8 @@
       "name": "IMG_0005.jpg",
       "size": 2500000,
       "thumbnail": "IMG_0005.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0005.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -72,8 +72,8 @@
       "name": "IMG_0006.jpg",
       "size": 2600000,
       "thumbnail": "IMG_0006.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0006.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -84,8 +84,8 @@
       "name": "IMG_0007.jpg",
       "size": 2700000,
       "thumbnail": "IMG_0007.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0007.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -96,8 +96,8 @@
       "name": "IMG_0008.jpg",
       "size": 2800000,
       "thumbnail": "IMG_0008.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0008.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -108,8 +108,8 @@
       "name": "IMG_0009.jpg",
       "size": 2900000,
       "thumbnail": "IMG_0009.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0009.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -120,8 +120,8 @@
       "name": "IMG_0010.jpg",
       "size": 3000000,
       "thumbnail": "IMG_0010.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0010.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -132,8 +132,8 @@
       "name": "IMG_0011.jpg",
       "size": 3100000,
       "thumbnail": "IMG_0011.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0011.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024
@@ -144,8 +144,8 @@
       "name": "IMG_0012.jpg",
       "size": 3200000,
       "thumbnail": "IMG_0012.jpg",
-      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
-      "added_at": "2026-08-19T07:38:27Z",
+      "original": "originals/IMG_0012.jpg",
+      "added_at": "2026-08-19T08:29:00Z",
       "dimensions": {
         "width": 4032,
         "height": 3024

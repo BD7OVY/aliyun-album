@@ -68,14 +68,18 @@ def diff_photos(existing: list, remote_files: list) -> dict:
 
 
 def add_photo(manifest: dict, file_info: dict, thumbnail_name: str,
-              share_url: str, dimensions: tuple = None):
-    """Add a photo entry to the manifest."""
+              original: str = '', dimensions: tuple = None):
+    """
+    Add a photo entry to the manifest.
+    original: relative path to the local original image (e.g. 'originals/<file_id>.jpg').
+              Kept for backward-compat as 'share_url' too if provided.
+    """
     entry = {
         'id': file_info['file_id'],
         'name': file_info['name'],
         'size': file_info.get('size', 0),
         'thumbnail': thumbnail_name,
-        'share_url': share_url,
+        'original': original,
         'added_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
     }
     if dimensions:

@@ -119,6 +119,25 @@ class AliyunClient:
             raise RuntimeError(f'Download produced no files for file_id={file_id}')
         return str(files[0])
 
+    # ── Upload ────────────────────────────────────────
+    def upload_file(self, file_path: str, parent_file_id='root', name: str | None = None):
+        """
+        Upload a local file to Aliyun Drive.
+        Returns the BaseFile response (has .file_id).
+        Duplicate names are auto-renamed by default.
+        """
+        return self._safe_call(
+            self._ali.upload_file,
+            file_path=file_path,
+            parent_file_id=parent_file_id,
+            name=name,
+        )
+
+    # ── Delete ────────────────────────────────────────
+    def delete_file(self, file_id: str):
+        """Delete a file from Aliyun Drive."""
+        return self._safe_call(self._ali.move_file_to_trash, file_id=file_id)
+
     # ── Share link ────────────────────────────────────
     def create_share_link(self, file_id: str) -> dict:
         """
