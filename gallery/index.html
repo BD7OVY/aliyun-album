@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>共享相册</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Password Gate -->
+  <div id="gate" class="gate-overlay">
+    <div class="gate-card">
+      <div class="gate-icon">&#128247;</div>
+      <h1 id="gate-title">共享相册</h1>
+      <p class="gate-hint">请输入访问密码</p>
+      <input type="password" id="gate-input" placeholder="访问密码" autocomplete="off">
+      <button id="gate-btn" class="btn-primary">进入相册</button>
+      <p id="gate-error" class="gate-error"></p>
+    </div>
+  </div>
+
+  <!-- Gallery -->
+  <div id="gallery" class="gallery-view" style="display:none">
+    <header class="gallery-header">
+      <h1 id="gallery-title">共享相册</h1>
+      <p id="gallery-subtitle"></p>
+    </header>
+
+    <div id="grid" class="photo-grid"></div>
+
+    <div id="sentinel" class="sentinel"></div>
+
+    <footer class="gallery-footer">
+      <span id="photo-count"></span>
+    </footer>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" style="display:none">
+    <div class="lb-backdrop"></div>
+    <button class="lb-close" title="关闭 (Esc)">&times;</button>
+    <button class="lb-nav lb-prev" title="上一张">&#8249;</button>
+    <button class="lb-nav lb-next" title="下一张">&#8250;</button>
+    <div class="lb-stage">
+      <img id="lb-image" src="" alt="">
+    </div>
+    <div class="lb-bar">
+      <span id="lb-name" class="lb-name"></span>
+      <a id="lb-original" class="btn-original" href="#" target="_blank" rel="noopener">
+        查看原图 &darr;
+      </a>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

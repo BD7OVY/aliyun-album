@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "updated_at": "2026-08-19T07:38:27Z",
+  "gallery": {
+    "title": "共享相册",
+    "subtitle": "珍贵瞬间，共同珍藏"
+  },
+  "password_hash": "",
+  "photos": [
+    {
+      "id": "mock_001",
+      "name": "IMG_0001.jpg",
+      "size": 2100000,
+      "thumbnail": "IMG_0001.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_002",
+      "name": "IMG_0002.jpg",
+      "size": 2200000,
+      "thumbnail": "IMG_0002.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_003",
+      "name": "IMG_0003.jpg",
+      "size": 2300000,
+      "thumbnail": "IMG_0003.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_004",
+      "name": "IMG_0004.jpg",
+      "size": 2400000,
+      "thumbnail": "IMG_0004.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_005",
+      "name": "IMG_0005.jpg",
+      "size": 2500000,
+      "thumbnail": "IMG_0005.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_006",
+      "name": "IMG_0006.jpg",
+      "size": 2600000,
+      "thumbnail": "IMG_0006.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_007",
+      "name": "IMG_0007.jpg",
+      "size": 2700000,
+      "thumbnail": "IMG_0007.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_008",
+      "name": "IMG_0008.jpg",
+      "size": 2800000,
+      "thumbnail": "IMG_0008.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_009",
+      "name": "IMG_0009.jpg",
+      "size": 2900000,
+      "thumbnail": "IMG_0009.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_010",
+      "name": "IMG_0010.jpg",
+      "size": 3000000,
+      "thumbnail": "IMG_0010.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_011",
+      "name": "IMG_0011.jpg",
+      "size": 3100000,
+      "thumbnail": "IMG_0011.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    },
+    {
+      "id": "mock_012",
+      "name": "IMG_0012.jpg",
+      "size": 3200000,
+      "thumbnail": "IMG_0012.jpg",
+      "share_url": "https://www.aliyundrive.com/s/mock_share_link",
+      "added_at": "2026-08-19T07:38:27Z",
+      "dimensions": {
+        "width": 4032,
+        "height": 3024
+      }
+    }
+  ]
+}

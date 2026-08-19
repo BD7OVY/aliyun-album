@@ -1,0 +1,26 @@
+{
+  "aliyun": {
+    "folder_id": "6a8564e037b1e4bb828f41e4aa0a92eb438be3e2",
+    "folder_name": "共享相册",
+    "file_types": [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".bmp",
+      ".webp",
+      ".heic"
+    ]
+  },
+  "gallery": {
+    "title": "共享相册",
+    "subtitle": "珍贵瞬间，共同珍藏",
+    "password_hash": "",
+    "thumbnail_width": 480,
+    "thumbnail_quality": 85,
+    "items_per_page": 30
+  },
+  "site": {
+    "base_url": ""
+  }
+}
