@@ -24,60 +24,58 @@ aliyun-album/
 │   ├── data.json        # 照片数据（harness 自动生成）
 │   └── thumbnails/      # 缩略图（harness 自动生成）
 ├── setup.bat            # 安装依赖
-└── run.bat              # 启动同步
+├── run.bat              # 启动同步
+└── deploy.bat           # 一键提交并推送 GitHub（线上更新）
 ```
 
 ## 快速开始
 
-### 1. 安装依赖
-```bat
-setup.bat
-```
+> 已帮你完成：token 配置、云盘"共享相册"文件夹创建、folder_id 写入、本地 git 初始化、依赖安装。
 
-### 2. 登录阿里云盘（三选一）
+### 第 0 步：上传照片（日常操作，手机就能做）
 
-**方式 A：浏览器复制 refresh_token（不用安装 aligo 即可拿到）**
-1. 浏览器打开 https://www.aliyundrive.com 或 https://www.alipan.com 登录
-2. F12 → Console（控制台）
-3. 粘贴并运行：
-   ```js
-   JSON.parse(localStorage.token).refresh_token
-   ```
-4. 复制返回的字符串，粘贴到 `.env` 的 `ALIYUN_REFRESH_TOKEN=` 后面
+1. 手机/电脑打开**阿里云盘 App**
+2. 进入网盘根目录的 **"共享相册"** 文件夹（已在你的云盘里建好）
+3. 把要分享的照片传进去（支持 jpg/png/gif/webp/heic）
+4. 完成
 
-**方式 B：扫码登录（最简单，无需手动找 token）**
-```bat
-copy .env.example .env
-setup.bat
-python harness/get_token.py
-```
-按提示用阿里云盘 App 扫描二维码即可。token 会自动保存到 `.env`。
+### 第 1 步：同步（生成相册数据）
 
-**方式 C：首次同步时自动扫码登录**
-直接运行 `run.bat`，如果没有配置 token，它会自动弹出二维码让你扫描。
+1. 双击 **`run.bat`**
+2. 等待输出 "Sync complete. N photos in manifest."
+3. 完成后 `gallery/` 里就有了最新缩略图和 data.json
 
-### 3. 配置相册文件夹
-编辑 `config.json`，设置 `aliyun.folder_id` 为相册文件夹 ID。获取方式：在阿里云盘网页版打开目标文件夹，地址栏最后一段就是 folder_id。
+### 第 2 步：设置访问密码（只需一次）
 
-### 4. 设置访问密码
 ```bat
 run.bat --set-pass
 ```
+输入你想分享给家人的密码。
 
-### 5. 同步
-```bat
-run.bat
-```
-Harness 会：列出云盘图片 → 下载原图 → 生成缩略图 → 创建分享链接 → 写入 data.json
+### 第 3 步：部署到 GitHub Pages
 
-### 6. 预览 / 部署
-```bat
-cd gallery
-python -m http.server 8090
-```
-浏览器打开 http://localhost:8090
+**一次性准备（首次）：**
+1. 浏览器打开 https://github.com/new
+2. Repository name 填 `aliyun-album`，选 **Public**，**不要**勾选任何初始化选项，点 Create
+3. 复制仓库地址（形如 `https://github.com/你的用户名/aliyun-album.git`）
+4. 在项目文件夹打开命令行，执行：
+   ```bat
+   git remote add origin 你的仓库地址
+   git push -u origin main
+   ```
+5. 打开 https://github.com/你的用户名/aliyun-album → Settings → Pages
+6. Source 选 **Deploy from a branch** → Branch 选 **main / (root)** → Save
+7. 等 1-2 分钟，访问 `https://你的用户名.github.io/aliyun-album/gallery/`
 
-部署：将 `gallery/` 目录上传到任意静态托管（GitHub Pages、对象存储等）。
+**以后每次更新（日常操作）：**
+1. 阿里云盘 App 上传新照片
+2. 双击 `run.bat`（同步）
+3. 双击 `deploy.bat`（提交并推送，1-2 分钟后线上更新）
+
+### 第 4 步：分享
+
+- **查看链接**：把 `https://你的用户名.github.io/aliyun-album/gallery/` + 访问密码 发给家人
+- **上传入口**：只你自己有（阿里云盘"共享相册"文件夹），家人不需要上传
 
 ## 工作流
 
