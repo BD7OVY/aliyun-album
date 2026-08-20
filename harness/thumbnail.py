@@ -5,7 +5,7 @@ Uses Pillow to resize images to thumbnails.
 Never touches the network or aligo.
 """
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 def generate_thumbnail(src_path: str, out_dir: str, max_width=480, quality=85,
@@ -14,6 +14,7 @@ def generate_thumbnail(src_path: str, out_dir: str, max_width=480, quality=85,
     Generate a thumbnail from a source image.
     Returns the thumbnail filename (not full path).
 
+    - Applies EXIF orientation so phone photos are never sideways
     - Resizes to max_width preserving aspect ratio
     - Converts to JPEG for consistent format and smaller size
     - Strips EXIF for privacy and size
@@ -26,6 +27,7 @@ def generate_thumbnail(src_path: str, out_dir: str, max_width=480, quality=85,
         raise FileNotFoundError(f'Source image not found: {src_path}')
 
     img = Image.open(src_path)
+    img = ImageOps.exif_transpose(img)
     img = img.convert('RGB')
 
     # Resize preserving aspect ratio

@@ -2,3 +2,5 @@
 *.pyc
 __pycache__/
 harness/__pycache__/
+incoming/
+.DS_Store
