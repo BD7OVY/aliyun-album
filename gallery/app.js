@@ -16,6 +16,12 @@
 
   // ── DOM refs ───────────────────────────────────
   const $ = (id) => document.getElementById(id);
+
+  // Never fail silently: surface any script error on the gate
+  window.addEventListener('error', (e) => {
+    const errEl = $('gate-error');
+    if (errEl) errEl.textContent = '页面加载出错，请用最新版浏览器打开：' + (e.message || '未知错误');
+  });
   const gate = $('gate');
   const gallery = $('gallery');
   const grid = $('grid');
@@ -62,17 +68,22 @@
     const tryUnlock = async () => {
       const pw = input.value;
       if (!pw) return;
-      const hash = await sha256(pw);
-      if (hash === expectedHash) {
-        unlockGallery();
-      } else {
-        $('gate-error').textContent = '密码错误，请重试';
-        input.value = '';
-        input.focus();
-        // Shake animation
-        btn.style.animation = 'none';
-        void btn.offsetWidth;
-        btn.style.animation = 'shake 0.4s';
+      try {
+        const hash = await sha256(pw);
+        if (hash === expectedHash) {
+          unlockGallery();
+        } else {
+          $('gate-error').textContent = '密码错误，请重试';
+          input.value = '';
+          input.focus();
+          // Shake animation
+          btn.style.animation = 'none';
+          void btn.offsetWidth;
+          btn.style.animation = 'shake 0.4s';
+        }
+      } catch (err) {
+        $('gate-error').textContent = '密码校验失败，请用最新版浏览器打开';
+        console.error(err);
       }
     };
 
